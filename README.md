@@ -19,7 +19,7 @@
 ## Βαθμολόγηση
 - Αλλαγές στο παιχνίδι όπως περιγράφονται στο [παραδοτέο 1](https://github.com/ioniodi/Shooter/issues/1): μέχρι 4. 
 - Σημαντικές αλλαγές στο παιχνίδι όπως περιγράφονται στο [παραδοτέο 2](https://github.com/ioniodi/Shooter/issues/2): μέχρι 8.
-- [Aξιολόγηση από ομότιμους](https://github.com/ioniodi/Super-Mario/issues/3): 9-10.
+- [Aξιολόγηση από ομότιμους](https://github.com/ioniodi/Shooter/issues/3): 9-10.
 
 ## Resources
 - [Phaser Tutorial](http://phaser.io/learn)
