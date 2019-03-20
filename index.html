@@ -189,7 +189,7 @@ body {
 			var MAX_ENEMY_SPACING = 3000;
 			var ENEMY_SPEED = 300;
 
-			var enemy = greenEnemies.getFirstExists(false);
+			var enemy = Enemies2.getFirstExists(false);
 			if (enemy) {
 				enemy.reset(game.rnd.integerInRange(0, game.width), -20);
 				enemy.body.velocity.x = game.rnd.integerInRange(-300, 300);
