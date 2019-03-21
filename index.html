@@ -208,7 +208,7 @@ body {
 					enemy.angle = 180 - game.math.radToDeg(Math.atan2(enemy.body.velocity.x, enemy.body.velocity.y));
 
 					enemy.trail.y = enemy.y;
-					enemy.trail.x = enemy.x -10;
+					enemy.trail.x = enemy.x + 10;
 
 					//  Kill enemies once they go off screen
 					if (enemy.x < -20){
