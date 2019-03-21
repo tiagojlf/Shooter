@@ -222,7 +222,7 @@ body {
 		}
 		
 		function addEnemyEmitterTrail(enemy) {
-			var enemyTrail = game.add.emitter(enemy.x + 10, player.y, 100);
+			var enemyTrail = game.add.emitter(enemy.x + 20, player.y, 100);
 			enemyTrail.width = 10;
 			enemyTrail.makeParticles('explosion', [1,2,3,4,5]);
 			enemyTrail.setYSpeed(20, -20);
