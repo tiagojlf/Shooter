@@ -190,11 +190,12 @@ body {
 			var ENEMY_SPEED = 300;
 
 			var enemy = enemies2.getFirstExists(false);
+			
 			if (enemy) {
 				enemy.reset(820, game.rnd.integerInRange(0, game.height));
 				enemy.body.velocity.x = -ENEMY_SPEED;
 				enemy.body.velocity.y = game.rnd.integerInRange(-300, 300);
-				enemy.body.drag.y = 50;
+				enemy.body.drag.y = 100;
 			}
 
 			//  Update function for each enemy ship to update rotation etc
