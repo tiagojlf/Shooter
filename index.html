@@ -28,9 +28,11 @@ body {
 		var cursors;
 		var bank;
 		var shipTrail;
+		var explosions;
 		var bullets;
 		var fireButton;
 		var bulletTimer = 0;
+		var shields;
 
 		var ACCLERATION = 600;
 		var DRAG = 400;
@@ -46,7 +48,8 @@ body {
 			game.load.image('starfield', 'assets/starfield.png');
 			game.load.image('ship', 'assets/ship.png');
 			game.load.image('bullet', 'assets/bullets/bullet.png');
-			game.load.image('enemy2', 'assets/enemies/enemy2.png');
+			game.load.image('enemy2', 'assets/enemies/green-enemy.png');
+			game.load.spritesheet('explosion', 'assets/explode.png', 128, 128);
 
 		}
 
@@ -69,10 +72,14 @@ body {
 
 			//  The hero!
 			player = game.add.sprite(100, game.height / 2, 'ship');
+			player.health = 100;
 			player.anchor.setTo(0.5, 0.5);
 			game.physics.enable(player, Phaser.Physics.ARCADE);
 			player.body.maxVelocity.setTo(MAXSPEED, MAXSPEED);
 			player.body.drag.setTo(DRAG, DRAG);
+			player.events.onKilled.add(function(){
+				shipTrail.kill();
+			});
 
 			//  The enemies!
 			enemies2 = game.add.group();
@@ -84,9 +91,15 @@ body {
 			enemies2.setAll('scale.x', 0.5);
 			enemies2.setAll('scale.y', 0.5);
 			enemies2.setAll('angle', 180);
-			enemies2.setAll('outOfBoundsKill', true);
-			enemies2.setAll('checkWorldBounds', true);
-
+			enemies2.forEach(function(enemy){
+				addEnemyEmitterTrail(enemy);
+				enemy.body.setSize(enemy.width * 3 / 4, enemy.height * 3 / 4);
+				enemy.damageAmount = 20;
+				enemy.events.onKilled.add(function(){
+					enemy.trail.kill();
+				});
+			});
+			
 			launchEnemy2();
 
 			
@@ -106,6 +119,22 @@ body {
 					Phaser.Easing.Quintic.Out);
 			shipTrail.start(false, 5000, 10);
 
+			//  An explosion pool
+			explosions = game.add.group();
+			explosions.enableBody = true;
+			explosions.physicsBodyType = Phaser.Physics.ARCADE;
+			explosions.createMultiple(30, 'explosion');
+			explosions.setAll('anchor.x', 0.5);
+			explosions.setAll('anchor.y', 0.5);
+			explosions.forEach( function(explosion) {
+				explosion.animations.add('explosion');
+			});
+			
+			//  Shields stat
+			shields = game.add.text(game.world.width - 150, 10, 'Shields: ' + player.health +'%', { font: '20px Arial', fill: '#fff' });
+			shields.render = function () {
+			shields.text = 'Shields: ' + Math.max(player.health, 0) +'%';
+			};
 		}
 
 		function update() {
@@ -146,18 +175,28 @@ body {
 			}
 
 			//  Fire bullet
-			if (player.alive && fireButton.isDown) {
+			if (player.alive && (fireButton.isDown || game.input.activePointer.isDown)) {
 				fireBullet();
 			}
 
 			//  Keep the shipTrail lined up with the ship
 			shipTrail.y = player.y;
 			shipTrail.x = player.x - 20;
+			
+			//  Check collisions
+			game.physics.arcade.overlap(player, enemies2, shipCollide, null, this);
+			game.physics.arcade.overlap(enemies2, bullets, hitEnemy, null, this);
 
 		}
 
 		function render() {
-
+			
+			// for (var i = 0; i < greenEnemies.length; i++)
+			// {
+			//     game.debug.body(greenEnemies.children[i]);
+			// }
+			// game.debug.body(player);
+			
 		}
 
 		function fireBullet() {
@@ -191,21 +230,64 @@ body {
 
 			var enemy = enemies2.getFirstExists(false);
 			if (enemy) {
-				enemy.reset(game.rnd.integerInRange(0, game.width), -20);
-				enemy.body.velocity.x = game.rnd.integerInRange(-300, 300);
-				enemy.body.velocity.y = ENEMY_SPEED;
-				enemy.body.drag.x = 100;
-			}
+				enemy.reset(820, game.rnd.integerInRange(0, game.height));
+				enemy.body.velocity.y = game.rnd.integerInRange(-300, 300);
+				enemy.body.velocity.x = -ENEMY_SPEED;
+				enemy.body.drag.y = 100;
+				
+				enemy.trail.start(false, 800, 1);
+				
+				//  Update function for each enemy ship to update rotation etc
+				enemy.update = function(){
+					enemy.angle = 180 - game.math.radToDeg(Math.atan2(enemy.body.velocity.x, enemy.body.velocity.y));
 
-			//  Update function for each enemy ship to update rotation etc
-			enemy.update = function(){
-			enemy.angle = 180 - game.math.radToDeg(Math.atan2(enemy.body.velocity.x, enemy.body.velocity.y));
+					enemy.trail.y = enemy.y;
+					enemy.trail.x = enemy.x + 10;
+
+					//  Kill enemies once they go off screen
+					if (enemy.x < -50){
+						enemy.kill();
+					}	
+				}
 			}
 			
 			//  Send another enemy soon
 			game.time.events.add(game.rnd.integerInRange(MIN_ENEMY_SPACING, MAX_ENEMY_SPACING), launchEnemy2);
 		}
 		
+		function addEnemyEmitterTrail(enemy) {
+			var enemyTrail = game.add.emitter(enemy.x + 20, player.y, 100);
+			enemyTrail.width = 10;
+			enemyTrail.makeParticles('explosion', [1,2,3,4,5]);
+			enemyTrail.setYSpeed(20, -20);
+			enemyTrail.setRotation(50,-50);
+			enemyTrail.setAlpha(0.4, 0, 800);
+			enemyTrail.setScale(0.01, 0.1, 0.01, 0.1, 1000, Phaser.Easing.Quintic.Out);
+			enemy.trail = enemyTrail;
+		}
+		
+		function shipCollide(player, enemy) {
+			var explosion = explosions.getFirstExists(false);
+			explosion.reset(enemy.body.x + enemy.body.halfWidth, enemy.body.y + enemy.body.halfHeight);
+			explosion.body.velocity.x = enemy.body.velocity.x;
+			explosion.alpha = 0.7;
+			explosion.play('explosion', 30, false, true);
+			enemy.kill();
+			player.damage(enemy.damageAmount);
+			shields.render();
+		}
+		
+		function hitEnemy(enemy, bullet) {
+			var explosion = explosions.getFirstExists(false);
+			explosion.reset(bullet.body.x + bullet.body.halfWidth, bullet.body.y + bullet.body.halfHeight);
+			explosion.body.velocity.x = enemy.body.velocity.x;
+			explosion.alpha = 0.7;
+			explosion.play('explosion', 30, false, true);
+			enemy.kill();
+			bullet.kill()
+		}
+		
 	</script>
 </body>
 </html>
+
