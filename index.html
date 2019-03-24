@@ -66,7 +66,7 @@ body {
 			game.load.image('enemy2', 'assets/enemies/green-enemy.png');
 			game.load.spritesheet('explosion', 'assets/explode.png', 128, 128);
 			//game.load.bitmapFont('spacefont', 'assets/spacefont/font.ltr');
-			//game.load.bitmapFont('spacefont', '/assets/spacefont/spacefont.png', '/assets/spacefont/spacefont.xml');
+			game.load.bitmapFont('spacefont', '/assets/spacefont/spacefont.png', '/assets/spacefont/spacefont.xml');
 
 		}
 
@@ -212,8 +212,6 @@ body {
 			//  Fire bullet
 			if (player.alive && (fireButton.isDown || game.input.activePointer.isDown)) {
 				fireBullet();
-				laser.play();
-
 			}
 
 			//  Keep the shipTrail lined up with the ship
