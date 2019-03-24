@@ -361,7 +361,7 @@ body {
 				var enemy = enemies3.getFirstExists(false);
 				if (enemy) {
 					enemy.startingY = startingY;
-					enemy.reset( game.width + horizontalSpacing * i, game.height / 2);
+					enemy.reset(20 + game.width + horizontalSpacing * i, game.height / 2);
 					enemy.body.velocity.x = -horizontalSpeed;
 					
 					//  Set up firing
@@ -376,8 +376,8 @@ body {
 						this.body.y = this.startingY + Math.sin((this.x) / frequency) * spread;
 
 						//  Squish and rotate ship for illusion of "banking"
-						bank = Math.cos((this.x + 60) / frequency)
-						this.scale.y = 1.0 - Math.abs(bank) / 8;
+						bank = Math.cos((this.y + 60) / frequency)
+						this.scale.y = 1.0 - Math.abs(bank) / 5;
 						this.angle = - bank * 2;
 
 						//  Fire
