@@ -226,6 +226,7 @@ body {
 			
 			//  Game over?			
 				if (! player.alive && gameOver.visible === false) {
+					death.play();
 					gameOver.visible = true;
 					gameOver.alpha = 0;
 					var fadeInGameOver = game.add.tween(gameOver);
@@ -354,7 +355,6 @@ body {
 		
 		function restart () {
 		//  Reset the enemies
-		death.play();
 		enemies2.callAll('kill');
 		game.time.events.remove(enemy2LaunchTimer);
 		game.time.events.add(1000, launchEnemy2);
