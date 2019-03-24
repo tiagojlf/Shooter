@@ -212,7 +212,7 @@ body {
 			//  Fire bullet
 			if (player.alive && (fireButton.isDown || game.input.activePointer.isDown)) {
 				fireBullet();
-				laser.reset();
+				laser.play();
 			}
 
 			//  Keep the shipTrail lined up with the ship
