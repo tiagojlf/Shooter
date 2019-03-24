@@ -212,6 +212,8 @@ body {
 			//  Fire bullet
 			if (player.alive && (fireButton.isDown || game.input.activePointer.isDown)) {
 				fireBullet();
+				laser.stop();
+				laser.play();
 			}
 
 			//  Keep the shipTrail lined up with the ship
@@ -261,8 +263,7 @@ body {
 				var BULLET_SPACING = 250;
 				//  Grab the first bullet we can from the pool
 				var bullet = bullets.getFirstExists(false);
-					laser.play();
-
+				
 				if (bullet) {
 					//  And fire it
 					//  Make bullet come out of tip of ship with right angle
