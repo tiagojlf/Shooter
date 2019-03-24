@@ -47,7 +47,6 @@ body {
 		var enemy2LaunchTimer;
 		var gameOver;
 		var laser = new Audio('assets/laser.wav');
-		laser.pause();
 		var explosion = new Audio('assets/explosion.wav');
 
 		var ACCLERATION = 600;
@@ -213,7 +212,7 @@ body {
 			//  Fire bullet
 			if (player.alive && (fireButton.isDown || game.input.activePointer.isDown)) {
 				fireBullet();
-				laser.reset();
+				laser.play();
 			}
 
 			//  Keep the shipTrail lined up with the ship
@@ -245,16 +244,6 @@ body {
 				}
 
 		}
-		
-		function reset() {
-    if (laser.paused) {
-        laser.play();
-    }else{
-        laser.pause();
-        laser.currentTime = 0;
-	laser.play()
-    }
-}
 
 		function render() {
 			
