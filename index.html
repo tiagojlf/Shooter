@@ -47,7 +47,9 @@ body {
 		var score = 0;
 		var scoreText;
 		var enemy2LaunchTimer;
+		var enemy2Spacing = 1000;
 		var enemy3LaunchTimer;
+		var enemy3Launched = false;
 		var gameOver;
 		var laser = new Audio('assets/laser.wav');
 		var blast = new Audio('assets/explosion.wav');
@@ -152,8 +154,6 @@ body {
 			enemies3.forEach(function(enemy){
 				enemy.damageAmount = 40;
 			});
-
-			game.time.events.add(1000, launchEnemy3);
 			
 			//  And some controls to play the game with
 			cursors = game.input.keyboard.createCursorKeys();
@@ -317,8 +317,7 @@ body {
 		}
 		
 		function launchEnemy2() {
-			var MIN_ENEMY_SPACING = 300;
-			var MAX_ENEMY_SPACING = 3000;
+
 			var ENEMY_SPEED = 300;
 
 			var enemy = enemies2.getFirstExists(false);
@@ -345,7 +344,7 @@ body {
 			}
 			
 			//  Send another enemy soon
-			enemy2LaunchTimer = game.time.events.add(game.rnd.integerInRange(MIN_ENEMY_SPACING, MAX_ENEMY_SPACING), launchEnemy2);
+			enemy2LaunchTimer = game.time.events.add(game.rnd.integerInRange(enemy2Spacing, enemy2Spacing + 1000), launchEnemy2);
 		}
 		
 		function launchEnemy3() {
@@ -355,7 +354,7 @@ body {
 			var frequency = 70;
 			var horizontalSpacing = 70;
 			var numEnemiesInWave = 5;
-			var timeBetweenWaves = 7000;
+			var timeBetweenWaves = 2500;
 
 			//  Launch wave
 			for (var i =0; i < numEnemiesInWave; i++) {
@@ -402,7 +401,7 @@ body {
 			}
 
 			//  Send another wave soon
-			enemy3LaunchTimer = game.time.events.add(timeBetweenWaves, launchEnemy3);
+			enemy3LaunchTimer = game.time.events.add(game.rnd.integerInRange(timeBetweenWaves, timeBetweenWaves + 4000), launchEnemy3);
 		}
 		
 		function addEnemyEmitterTrail(enemy) {
@@ -440,7 +439,18 @@ body {
 			
 			// Increase score
 			score += enemy.damageAmount * 10;
-			scoreText.render()
+			scoreText.render();
+			
+			//  Pacing
+			//  Enemies come quicker as score increases
+			enemy2Spacing *= 0.9;
+			//  Blue enemies come in after a score of 1000
+			if (!enemy3Launched && score > 1000) {
+				enemy3Launched = true;
+				launchEnemy3();
+				//  Slow green enemies down now that there are other enemies
+				enemy3Spacing *= 2;
+			}
 		}
 		
 		function enemyHitsPlayer (player, bullet) {
@@ -459,7 +469,9 @@ body {
 		enemies2.callAll('kill');
 		game.time.events.remove(enemy2LaunchTimer);
 		game.time.events.add(1000, launchEnemy2);
+		enemies3.callAll('kill');
 		enemy3Bullets.callAll('kill');
+		game.time.events.remove(enemy3LaunchTimer);
 			
 		enemies3.callAll('kill');
 		game.time.events.remove(enemy3LaunchTimer);
@@ -474,6 +486,11 @@ body {
 		//  Hide the text
 		gameOver.visible = false;
 
+			
+		//  Reset pacing
+		enemy2Spacing = 1000;
+		enemy3Launched = false;
+			
 		}
 		
 	</script>
