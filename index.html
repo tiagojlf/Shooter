@@ -114,6 +114,7 @@ body {
 			enemies2.createMultiple(5, 'enemy2');
 			enemies2.setAll('anchor.x', 0.5);
 			enemies2.setAll('anchor.y', 0.5);
+			enemies2.setAll('angle', 90);
 			enemies2.forEach(function(enemy){
 				addEnemyEmitterTrail(enemy);
 				enemy.body.setSize(enemy.width * 3 / 4, enemy.height * 3 / 4);
