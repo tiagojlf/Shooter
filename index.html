@@ -212,7 +212,7 @@ body {
 			//  Fire bullet
 			if (player.alive && (fireButton.isDown || game.input.activePointer.isDown)) {
 				fireBullet();
-				laser.stop();
+				laser.reset();
 			}
 
 			//  Keep the shipTrail lined up with the ship
@@ -244,6 +244,16 @@ body {
 				}
 
 		}
+		
+		function reset() {
+    if (laser.paused) {
+        laser.play();
+    }else{
+        laser.pause();
+        laser.currentTime = 0;
+	audio.play()
+    }
+}
 
 		function render() {
 			
@@ -264,7 +274,7 @@ body {
 				var bullet = bullets.getFirstExists(false);
 				
 				if (bullet) {
-									laser.play();
+
 					//  And fire it
 					//  Make bullet come out of tip of ship with right angle
 					var bulletOffset = 20 * Math.sin(game.math
