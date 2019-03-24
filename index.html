@@ -16,7 +16,7 @@ body {
 <body>
 
 	<audio id="myaudio" autoplay loop>
-		<source src="assets/sonictheme.mp3" type="audio/mpeg">
+		<source src="assets/soundtrack.mp3" type="audio/mpeg">
 	</audio>
 	
 	<script type="text/javascript">
@@ -34,6 +34,7 @@ body {
 		var player;
 		var enemies2;
 		var enemies3;
+		var enemyBullets;
 		var starfield;
 		var cursors;
 		var bank;
@@ -50,7 +51,7 @@ body {
 		var gameOver;
 		var laser = new Audio('assets/laser.wav');
 		var blast = new Audio('assets/explosion.wav');
-		var death = new Audio('assets/death.wav');
+		var death = new Audio('assets/death.mp3');
 
 
 		var ACCLERATION = 600;
@@ -69,6 +70,7 @@ body {
 			game.load.image('bullet', 'assets/bullets/bullet.png');
 			game.load.image('enemy2', 'assets/enemies/enemy2.png');
 			game.load.image('enemy3', 'assets/enemies/enemy3.png');
+			game.load.image('blueEnemyBullet', 'assets/enemy-blue-bullet.png');
 			game.load.spritesheet('explosion', 'assets/explode.png', 128, 128);
 			//game.load.bitmapFont('spacefont', 'assets/spacefont/font.ltr');
 			game.load.bitmapFont('spacefont', 'assets/spacefont/spacefont.png', '/assets/spacefont/spacefont.xml');
@@ -131,9 +133,6 @@ body {
 			enemies3.createMultiple(30, 'enemy3');
 			enemies3.setAll('anchor.x', 0.5);
 			enemies3.setAll('anchor.y', 0.5);
-			enemies3.setAll('scale.x', 0.5);
-			enemies3.setAll('scale.y', 0.5);
-			enemies3.setAll('angle', 180);
 			enemies3.forEach(function(enemy){
 				enemy.damageAmount = 40;
 			});
@@ -356,7 +355,7 @@ body {
 						//  Squish and rotate ship for illusion of "banking"
 						bank = Math.cos((this.x + 60) / frequency)
 						this.scale.y = 0.5 - Math.abs(bank) / 8;
-						this.angle = 180 - bank * 2;
+						this.angle = -90 - bank * 2;
 
 						//  Kill enemies once they go off screen
 						if (this.x < -200) {
