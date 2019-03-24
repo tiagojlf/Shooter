@@ -48,6 +48,8 @@ body {
 		var gameOver;
 		var laser = new Audio('assets/laser.wav');
 		var blast = new Audio('assets/explosion.wav');
+		var death = new Audio('assets/death.wav');
+
 
 		var ACCLERATION = 600;
 		var DRAG = 400;
@@ -212,7 +214,6 @@ body {
 			//  Fire bullet
 			if (player.alive && (fireButton.isDown || game.input.activePointer.isDown)) {
 				fireBullet();
-				laser.play();
 			}
 
 			//  Keep the shipTrail lined up with the ship
@@ -223,7 +224,7 @@ body {
 			game.physics.arcade.overlap(player, enemies2, shipCollide, null, this);
 			game.physics.arcade.overlap(enemies2, bullets, hitEnemy, null, this);
 			
-			//  Game over?
+			//  Game over?			
 				if (! player.alive && gameOver.visible === false) {
 					gameOver.visible = true;
 					gameOver.alpha = 0;
@@ -258,6 +259,7 @@ body {
 		function fireBullet() {
 			//  To avoid them being allowed to fire too fast we set a time limit
 			if (game.time.now > bulletTimer) {
+				laser.play();
 				var BULLET_SPEED = 400;
 				var BULLET_SPACING = 250;
 				//  Grab the first bullet we can from the pool
@@ -352,6 +354,7 @@ body {
 		
 		function restart () {
 		//  Reset the enemies
+		death.play();
 		enemies2.callAll('kill');
 		game.time.events.remove(enemy2LaunchTimer);
 		game.time.events.add(1000, launchEnemy2);
