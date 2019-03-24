@@ -33,6 +33,8 @@ body {
 		var fireButton;
 		var bulletTimer = 0;
 		var shields;
+		var enemy2LaunchTimer;
+		var gameOver;
 
 		var ACCLERATION = 600;
 		var DRAG = 400;
@@ -80,6 +82,10 @@ body {
 			player.events.onKilled.add(function(){
 				shipTrail.kill();
 			});
+			
+			player.events.onRevived.add(function(){
+				shipTrail.start(false, 5000, 10);
+			});
 
 			//  The enemies!
 			enemies2 = game.add.group();
@@ -100,7 +106,7 @@ body {
 				});
 			});
 			
-			launchEnemy2();
+			game.time.events.add(1000, launchEnemy2);
 
 			
 			//  And some controls to play the game with
@@ -135,6 +141,11 @@ body {
 			shields.render = function () {
 			shields.text = 'Shields: ' + Math.max(player.health, 0) +'%';
 			};
+			
+			//  Game over text
+			gameOver = game.add.text(game.world.centerX, game.world.centerY, 'GAME OVER!', { font: '84px Arial', fill: '#fff' });
+			gameOver.anchor.setTo(0.5, 0.5);
+			gameOver.visible = false;
 		}
 
 		function update() {
@@ -186,6 +197,25 @@ body {
 			//  Check collisions
 			game.physics.arcade.overlap(player, enemies2, shipCollide, null, this);
 			game.physics.arcade.overlap(enemies2, bullets, hitEnemy, null, this);
+			
+			//  Game over?
+				if (! player.alive && gameOver.visible === false) {
+					gameOver.visible = true;
+					var fadeInGameOver = game.add.tween(gameOver);
+					fadeInGameOver.to({alpha: 1}, 1000, Phaser.Easing.Quintic.Out);
+					fadeInGameOver.onComplete.add(setResetHandlers);
+					fadeInGameOver.start();
+					function setResetHandlers() {
+						//  The "click to restart" handler
+						tapRestart = game.input.onTap.addOnce(_restart,this);
+						spaceRestart = fireButton.onDown.addOnce(_restart,this);
+						function _restart() {
+							tapRestart.detach();
+							spaceRestart.detach();
+							restart();
+						}
+					}
+				}
 
 		}
 
@@ -252,7 +282,7 @@ body {
 			}
 			
 			//  Send another enemy soon
-			game.time.events.add(game.rnd.integerInRange(MIN_ENEMY_SPACING, MAX_ENEMY_SPACING), launchEnemy2);
+			enemy2LaunchTimer = game.time.events.add(game.rnd.integerInRange(MIN_ENEMY_SPACING, MAX_ENEMY_SPACING), launchEnemy2);
 		}
 		
 		function addEnemyEmitterTrail(enemy) {
@@ -285,6 +315,24 @@ body {
 			explosion.play('explosion', 30, false, true);
 			enemy.kill();
 			bullet.kill()
+		}
+		
+		function restart () {
+		//  Reset the enemies
+		enemies2.callAll('kill');
+		game.time.events.remove(enemy2LaunchTimer);
+		game.time.events.add(1000, launchEnemy2);
+
+		//  Revive the player
+		player.revive();
+		player.health = 100;
+		shields.render();
+		score = 0;
+		scoreText.render();
+
+		//  Hide the text
+		gameOver.visible = false;
+
 		}
 		
 	</script>
