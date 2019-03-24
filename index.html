@@ -33,6 +33,7 @@ body {
 
 		var player;
 		var enemies2;
+		var enemies3;
 		var starfield;
 		var cursors;
 		var bank;
@@ -45,6 +46,7 @@ body {
 		var score = 0;
 		var scoreText;
 		var enemy2LaunchTimer;
+		var enemy3LaunchTimer;
 		var gameOver;
 		var laser = new Audio('assets/laser.wav');
 		var blast = new Audio('assets/explosion.wav');
@@ -65,10 +67,11 @@ body {
 			game.load.image('starfield', 'assets/starfield.png');
 			game.load.image('ship', 'assets/ship.png');
 			game.load.image('bullet', 'assets/bullets/bullet.png');
-			game.load.image('enemy2', 'assets/enemies/green-enemy.png');
+			game.load.image('enemy2', 'assets/enemies/enemy2.png');
+			game.load.image('enemy3', 'assets/enemy3.png');
 			game.load.spritesheet('explosion', 'assets/explode.png', 128, 128);
 			//game.load.bitmapFont('spacefont', 'assets/spacefont/font.ltr');
-			game.load.bitmapFont('spacefont', '/assets/spacefont/spacefont.png', '/assets/spacefont/spacefont.xml');
+			game.load.bitmapFont('spacefont', 'assets/spacefont/spacefont.png', '/assets/spacefont/spacefont.xml');
 
 		}
 
