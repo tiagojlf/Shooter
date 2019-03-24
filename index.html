@@ -244,14 +244,6 @@ body {
 				}
 
 		}
-
-		function reset() {
-    if (laser.paused) {
-        laser.play();
-    }else{
-        laser.currentTime = 0
-    }
-}
 		
 		function render() {
 			
@@ -340,6 +332,7 @@ body {
 			enemy.kill();
 			player.damage(enemy.damageAmount);
 			shields.render();
+			explosion.play();
 		}
 		
 		function hitEnemy(enemy, bullet) {
