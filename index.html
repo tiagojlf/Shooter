@@ -47,7 +47,7 @@ body {
 		var enemy2LaunchTimer;
 		var gameOver;
 		var laser = new Audio('assets/laser.wav');
-		var explosion = new Audio('assets/explosion.wav');
+		var blast = new Audio('assets/explosion.wav');
 
 		var ACCLERATION = 600;
 		var DRAG = 400;
@@ -332,7 +332,7 @@ body {
 			enemy.kill();
 			player.damage(enemy.damageAmount);
 			shields.render();
-			explosion.play();
+			blast.play();
 		}
 		
 		function hitEnemy(enemy, bullet) {
@@ -343,6 +343,7 @@ body {
 			explosion.play('explosion', 30, false, true);
 			enemy.kill();
 			bullet.kill()
+			blast.play();
 			
 			// Increase score
 			score += enemy.damageAmount * 10;
