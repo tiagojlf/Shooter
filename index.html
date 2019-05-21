@@ -723,6 +723,14 @@ body {
 			}
 		}
 		
+		function launchBoss() {
+			boss.reset(game.width + boss.width, game.height / 2);
+			// Talvez mudar
+			booster.start(false, 1000, 10);
+			boss.health = 501;
+			bossBulletTimer = game.time.now + 5000;
+		}
+		
 		function hitEnemy(enemy, bullet) {
 			var explosion = explosions.getFirstExists(false);
 			explosion.reset(bullet.body.x + bullet.body.halfWidth, bullet.body.y + bullet.body.halfHeight);
