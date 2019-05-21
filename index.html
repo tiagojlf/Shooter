@@ -115,6 +115,7 @@ body {
 			game.physics.enable(player, Phaser.Physics.ARCADE);
 			player.body.maxVelocity.setTo(MAXSPEED, MAXSPEED);
 			player.body.drag.setTo(DRAG, DRAG);
+			player.weaponLevel = 1;
 			player.events.onKilled.add(function(){
 				shipTrail.kill();
 			});
