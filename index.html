@@ -55,6 +55,10 @@ body {
 		var weapon;
 		var weaponLaunchTimer;
 		var weaponLaunched = false;
+		var asteroid;
+		var asteroidLaunchTimer;
+		var asteroidSpacing = 5000;
+		var asteroidLaunched = false;
 		var bossLaunchTimer;
 		var bossLaunched = false;
 		var bossSpacing = 20000;
@@ -82,6 +86,7 @@ body {
 			game.load.image('enemy2', 'assets/enemies/enemy2.png');
 			game.load.image('enemy3', 'assets/enemies/enemy3.png');
 			game.load.image('weaponsp', 'assets/bullets/death-ray.png');
+			game.load.image('asteroidsp', '/assets/bullets/bullet1.png');
 			game.load.image('enemy3Bullet', 'assets/bullets/blue-enemy-bullet.png');
 			game.load.spritesheet('explosion', 'assets/explode.png', 128, 128);
 			//game.load.bitmapFont('spacefont', 'assets/spacefont/font.ltr');
@@ -178,6 +183,25 @@ body {
 			weapon.callAll('crop', null, {x: 90, y: 0, width: 120, height: 70});
 			weapon.forEach(function(diamond){
 				diamond.body.setSize(diamond.width * 3 / 4, diamond.height * 3 / 4);
+			});
+			
+			// Asteroids
+			asteroid = game.add.group();
+			asteroid.enableBody = true;
+			asteroid.physicsBodyType = Phaser.Physics.ARCADE;
+			asteroid.createMultiple(5, 'asteroidsp');
+			asteroid.setAll('anchor.x', 0.5);
+			asteroid.setAll('anchor.y', 0.5);
+			asteroid.setAll('scale.x', 2);
+			asteroid.setAll('scale.y', 4);
+			asteroid.forEach(function(rock){
+				addAsteroidEmitterTrail(rock);
+				rock.body.setSize(rock.width * 3 / 4, rock.height * 3 / 4);
+				rock.damageAmount = 20;
+				rock.angle = 180;
+				rock.events.onKilled.add(function(){
+					rock.trail.kill();
+				});
 			});
 			
 			//  And some controls to play the game with
@@ -447,7 +471,7 @@ body {
 			game.physics.arcade.overlap(player, weapon, weaponCollide, null, this);
 			game.physics.arcade.overlap(player, boss.rayRight, enemyHitsPlayer, null, this);
 			game.physics.arcade.overlap(player, boss.rayLeft, enemyHitsPlayer, null, this);
-			
+			game.physics.arcade.overlap(player, asteroid, asteroidCollide, null, this);
 			
 			//  Game over?			
 				if (! player.alive && gameOver.visible === false) {
@@ -679,6 +703,17 @@ body {
 			enemy.trail = enemyTrail;
 		}
 		
+		function addAsteroidEmitterTrail(rock) {
+			var asteroidTrail = game.add.emitter(rock.x + 10, player.y, 100);
+			asteroidTrail.width = 10;
+			asteroidTrail.makeParticles('explosion', [1,2,3,4,5]);
+			asteroidTrail.setYSpeed(20, -20);
+			asteroidTrail.setRotation(50,-50);
+			asteroidTrail.setAlpha(0.4, 0, 800);
+			asteroidTrail.setScale(0.01, 0.1, 0.01, 0.1, 1000, Phaser.Easing.Quintic.Out);
+			rock.trail = asteroidTrail;
+		}
+		
 		function shipCollide(player, enemy) {
 
 			enemy.kill();
@@ -723,6 +758,45 @@ body {
 			}
 		}
 		
+		function launchAsteroid() {
+			var ASTEROID_SPEED = 300;
+			var rock = asteroid.getFirstExists(false);
+			
+			if (rock) {
+				rock.reset(game.width + 20, game.rnd.integerInRange(20, game.height-20));
+				rock.body.velocity.x = - ASTEROID_SPEED;
+				rock.body.velocity.y = game.rnd.integerInRange(-100, 100);
+				rock.trail.start(false, 800, 1);
+				rock.update = function() {
+					rock.trail.x = rock.x + 10;
+					rock.trail.y = rock.y;
+					if (rock.x < -20) {
+						rock.kill;
+					}
+				}
+			}
+			//Send another weapon soon
+			asteroidLaunchTimer = game.time.events.add(game.rnd.integerInRange(asteroidSpacing, asteroidSpacing + 1000), launchAsteroid);	
+		}
+		
+		function asteroidCollide (player, asteroid) {
+			asteroid.kill();
+			explode.play();
+			player.damage(asteroid.damageAmount);
+			shields.render();
+			scoreText.render();
+			if (player.alive) {
+				var explosion = explosions.getFirstExists(false);
+				explosion.reset(player.body.x + player.body.halfWidth, player.body.y + player.body.halfHeight);
+				explosion.alpha = 0.7;
+				explosion.play('explosion', 30, false, true);
+			} else {
+				playerDeath.x = player.x;
+				playerDeath.y = player.y;
+				playerDeath.start(false, 1000, 10, 10);
+			}
+		}
+		
 		function launchBoss() {
 			boss.reset(game.width + boss.width, game.height / 2);
 			booster.start(false, 1000, 10);
@@ -761,6 +835,10 @@ body {
 			if (!weaponLaunched && score > 1500) {
 				weaponLaunched = true;
 				launchWeapon();
+			}
+			if (!asteroidLaunched && score > 500) {
+				asteroidLaunched = true;
+				launchAsteroid();
 			}
 			
 			//  Launch boss
@@ -828,6 +906,10 @@ body {
 		game.time.events.remove(weaponLaunchTimer);	
 		weaponLaunched = false;
 		player.weaponLevel = 1;
+			
+		asteroid.callAll('kill');
+		game.time.events.remove(asteroidLaunchTimer);
+		asteroidLaunched = false;
 			
 		//  Revive the player
 		player.revive();
